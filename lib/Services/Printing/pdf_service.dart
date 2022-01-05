@@ -12,7 +12,7 @@ class PdfInvoiceService {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
-        footer: (context) => buildFooter(),
+        footer: (context) => buildFooter(user!),
         build: (context) => buildInvoice(invoice),
         header: (context) => buildHeader(invoice, user!)));
     return await pdf.save();

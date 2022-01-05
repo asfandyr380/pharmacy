@@ -8,6 +8,7 @@ List<Widget> buildInvoice(PdfInvoice invoice) => [
       _buildTitle(invoice),
       SizedBox(height: 0.8 * PdfPageFormat.cm),
       _buildProduct(invoice),
+      Spacer(),
       Divider(),
       _buildSummery(invoice),
       Divider(),
@@ -22,8 +23,6 @@ Widget _buildTitle(PdfInvoice invoice) {
             fontWeight: FontWeight.bold,
             fontSize: 24,
           )),
-      SizedBox(height: 0.8 * PdfPageFormat.cm),
-      Text(invoice.sale.note),
     ],
   );
 }
@@ -205,6 +204,15 @@ Widget _buildCompanyInfo(UserModel user) {
   );
 }
 
-Widget buildFooter() => Center(
-    child: Text(
-        'This Software is Developed by Pro Creative Solution for Contact 00000000'));
+Widget buildFooter(UserModel user) => Column(
+      children: [
+        Text('EXPIRY CLAIMS WILL BE ACCEPTED (7) MONTHS BEFORE EXPIRY'),
+        Text('FORM 2A (see rule 19 & 30)'),
+        Text('Warranty under section 23(1)(i) of the Drug Act 1976 \nI being a person resident in pakistan carrying on business at company address under the \nname ${user.shopename} and being an authorised agent. do hereby give this warranty that the drugs sold by me \ndo not contravence in anyway in provisions of section 23 of the drug act 1976.'),
+        Text('Note: This Warranty does not apply to unani, Homeopathic, Bio Chemic System of medicineand general items',
+        style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 0.3 * PdfPageFormat.cm),
+        Text(
+            'This Software is Developed by Pro Creative Solution Copyright © 2021 for Contact +923059797601'),
+      ],
+    );
