@@ -47,6 +47,7 @@ dependencies:
   printing: ^5.6.0
 
 dev_dependencies:
+  msix: ^2.6.4
   flutter_test:
     sdk: flutter
 
@@ -91,3 +92,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+msix_config:
+  display_name: Pharamcy
+  publisher_display_name: Asfand Yar
+  identity_name: 6xperts.com.MyApp
+  msix_version: 1.0.0.0
+  capabilities: 'internetClient'
