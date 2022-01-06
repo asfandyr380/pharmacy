@@ -10,6 +10,7 @@ class UserModel {
   String? address2 = '';
   String? licenceNo = '';
   String? expirationDate = '';
+  num? previous = 0;
   int? employeeUserId = 0;
   UserModel({
     this.email,
@@ -32,7 +33,8 @@ class UserModel {
         settingId = map['settings_Id'],
         address1 = map['address1'],
         address2 = map['address2'],
-        licenceNo = map['lisence_no'],
+        licenceNo = map['lisence_no'].toString(),
+        previous = map['previous'],
         employeeUserId = map['employee_user_Id'],
         expirationDate = map['date'];
 
@@ -47,6 +49,7 @@ class UserModel {
         'address1': address1,
         'address2': address2,
         'lisence_no': licenceNo,
+        'previous': previous,
         'employee_user_Id': employeeUserId,
         'date': expirationDate,
       };

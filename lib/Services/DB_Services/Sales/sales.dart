@@ -15,7 +15,7 @@ class SalesService {
       MySqlConnection _conn = await _connection.establishConnection();
       UserSetting? user = await LocalStorage.getUserSetting();
       var result = await _conn.query(
-        'insert into sales (customer_Id, total, discount, grandTotal, date, user_Id, note, advance_tax, time) values(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'insert into sales (customer_Id, total, discount, grandTotal, date, user_Id, note, advance_tax, time, paid) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           model.customerId,
           model.total,
@@ -26,6 +26,7 @@ class SalesService {
           model.note,
           model.tax,
           model.time,
+          model.paid,
         ],
       );
       _conn.close();
@@ -221,7 +222,6 @@ class SalesService {
         await _conn.query('select * from sold_medicine where sale_Id = $id');
     _conn.close();
     List<SoldMedicineModel> saleslist = [];
-    print(result);
     for (var r in result) {
       var map = {
         'id': r[0],
@@ -247,9 +247,9 @@ class SalesService {
     MySqlConnection _conn = await _connection.establishConnection();
     var result = await _conn
         .query('select * from sales where user_Id = ${user!.userId}');
-    _conn.close();
     List<SalesModel> saleslist = [];
     for (var r in result) {
+      
       var map = {
         'id': r[0],
         'customer_Id': r[1],
@@ -261,10 +261,12 @@ class SalesService {
         'tax': r[8],
         'time': r[9],
         'received': r[10],
+        'paid': r[11],
       };
       var sale = SalesModel.fromJson(map);
       saleslist.add(sale);
     }
+    _conn.close();
     return saleslist;
   }
 

@@ -9,6 +9,8 @@ class SalesModel {
     required this.note,
     required this.tax,
     required this.time,
+    required this.paid,
+    this.previous,
   });
   final int? id;
   final int? customerId;
@@ -16,6 +18,8 @@ class SalesModel {
   num discount;
   num grandTotal;
   num tax;
+  num paid;
+  num? previous;
   final String date;
   final String note;
   final String time;
@@ -31,5 +35,7 @@ class SalesModel {
         tax = map['tax'],
         time = map['time'],
         received = map['received'],
+        paid = map['paid'],
+        previous = map['previous'],
         note = map['note'];
 }

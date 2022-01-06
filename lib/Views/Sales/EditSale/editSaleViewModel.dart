@@ -25,6 +25,7 @@ class EditSaleViewModel extends ChangeNotifier {
         taxController.text = m.tax.toString();
         discountController1.text = m.discount.toString();
         currentDate = m.date;
+        paidController.text = m.paid.toString();
         notifyListeners();
       }
     });
@@ -115,6 +116,7 @@ class EditSaleViewModel extends ChangeNotifier {
     discountController.dispose();
     grandTotalController.dispose();
     discountController1.dispose();
+    paidController.dispose();
   }
 
   @override
@@ -158,8 +160,8 @@ class EditSaleViewModel extends ChangeNotifier {
     customerlist = result;
     notifyListeners();
     if (m.customerId != 0) {
-      UserModel customer = await _customersService.getCustomer(m.customerId!);
-      selectedCustomer = customer;
+      var customer = await _customersService.getCustomer(m.customerId!);
+      selectedCustomer = customer[0];
       notifyListeners();
     }
   }
@@ -170,6 +172,7 @@ class EditSaleViewModel extends ChangeNotifier {
   TextEditingController quantityController = TextEditingController();
   TextEditingController packController = TextEditingController();
   TextEditingController discountController = TextEditingController();
+  TextEditingController paidController = TextEditingController();
   List<SoldMedicineModel> productlist = [];
   List<SoldMedicineModel> newProducts = [];
   double totalAmt = 0;
@@ -260,6 +263,7 @@ class EditSaleViewModel extends ChangeNotifier {
           quantityController.clear();
           packController.clear();
           discountController.clear();
+          paidController.clear();
         }
       }
     }
@@ -326,7 +330,7 @@ class EditSaleViewModel extends ChangeNotifier {
         double cashDiscount = double.parse(discountController1.text);
         double grandtotal = double.parse(grandTotalController.text);
         double? tax = double.tryParse(taxController.text);
-
+        double? paid = double.tryParse(paidController.text);
         SalesModel model = SalesModel(
           id: id,
           total: totalAmt,
@@ -335,6 +339,7 @@ class EditSaleViewModel extends ChangeNotifier {
           note: sNote,
           date: currentDate,
           tax: tax ?? 0,
+          paid: paid ?? 0,
           time: time.format(context),
           customerId: selectedCustomer != null ? selectedCustomer!.id : 0,
         );

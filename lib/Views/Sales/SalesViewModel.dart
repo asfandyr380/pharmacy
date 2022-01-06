@@ -116,7 +116,7 @@ class SalesViewModel extends ChangeNotifier {
     List<SoldMedicineModel> result = await _salesService.getSale(m.id!);
     if (m.customerId != 0) {
       var customer = await _customersService.getCustomer(m.customerId!);
-      invoice = PdfInvoice(sale: m, soldMedicines: result, customer: customer);
+      invoice = PdfInvoice(sale: m, soldMedicines: result, customer: customer[0]);
     } else {
       invoice = PdfInvoice(sale: m, soldMedicines: result);
     }

@@ -15,35 +15,34 @@ List<Widget> buildInvoice(PdfInvoice invoice) => [
     ];
 
 Widget _buildTitle(PdfInvoice invoice) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text('Invoice',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          )),
-    ],
+  return Center(
+    child: Text(
+      'Invoice',
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 24,
+      ),
+    ),
   );
 }
 
 Widget _buildProduct(PdfInvoice invoice) {
   var headers = [
-    "Name",
-    "Batch",
     "Qty",
-    "Packs",
-    "Rate",
+    "Product Name",
+    "Pack",
+    "Batch + Expiry",
+    "T.Rate",
     "Disc",
     "Total",
   ];
 
   final data = invoice.soldMedicines.map((item) {
     return [
-      item.medicineName,
-      "${item.batchNo}",
       "${item.quantity}",
+      item.medicineName,
       "${item.packs}",
+      "${item.batchNo}",
       "${item.salePrice}",
       "${item.discount}%",
       "${item.totalAmt}",
@@ -69,11 +68,24 @@ Widget _buildProduct(PdfInvoice invoice) {
 }
 
 Widget _buildSummery(PdfInvoice invoice) {
+  num previous = (invoice.sale.total + invoice.customer!.previous!) - (invoice.sale.paid);
   return Container(
     alignment: Alignment.centerRight,
     child: Row(
       children: [
-        Spacer(flex: 6),
+        invoice.customer != null ?
+        Expanded(
+          flex: 4,
+          child: Column(
+            children: [
+              _buildText('Current Balance', "${invoice.sale.total}", true),
+              _buildText('Previous', "${invoice.customer!.previous}", true),
+              _buildText('Paid', "${invoice.sale.paid}", true),
+              _buildText('Balance', "${previous.toStringAsFixed(2)}", true),
+            ],
+          ),
+        ): Spacer(flex: 4),
+        Spacer(flex: 2),
         Expanded(
           flex: 4,
           child: Column(
@@ -110,19 +122,28 @@ Widget _buildText(String title, String value, bool united) {
 }
 
 Widget buildHeader(PdfInvoice invoice, UserModel user) {
-  return Column(
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildCompanyInfo(user),
-          _buildInvoiceInfo(invoice.sale, user),
-          SizedBox(height: 4 * PdfPageFormat.cm),
-        ],
-      ),
-    ],
+  return Padding(
+    padding: EdgeInsets.symmetric(horizontal: 5),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildCompanyInfo(user),
+        invoice.customer != null
+            ? _buildCustomerInfo(invoice.customer!)
+            : Container(),
+        _buildInvoiceInfo(invoice.sale, user),
+      ],
+    ),
   );
 }
+
+Widget _buildCustomerInfo(UserModel customer) =>
+    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Cutomer', style: TextStyle(fontWeight: FontWeight.bold)),
+      Text('${customer.name}'),
+      Text('${customer.address1}'),
+    ]);
 
 Widget _buildInvoiceInfo(SalesModel sale, UserModel user) {
   TextStyle style = TextStyle(fontWeight: FontWeight.bold);
@@ -190,16 +211,17 @@ Widget _buildInvoiceInfo(SalesModel sale, UserModel user) {
 
 Widget _buildCompanyInfo(UserModel user) {
   TextStyle style = TextStyle(fontWeight: FontWeight.bold);
+  String shop_name = user.shopename ?? '';
+  String email = user.email ?? '';
+  String address = user.address1 ?? '';
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text('${user.shopename}', style: style),
+      Text('$shop_name', style: style),
       SizedBox(height: 0.2 * PdfPageFormat.cm),
-      Text('${user.email}'),
+      Text('Email:'),
       SizedBox(height: 0.2 * PdfPageFormat.cm),
-      Text('${user.phone}'),
-      SizedBox(height: 0.2 * PdfPageFormat.cm),
-      Text('${user.address1}'),
+      Text('Company Address:'),
     ],
   );
 }
@@ -208,11 +230,13 @@ Widget buildFooter(UserModel user) => Column(
       children: [
         Text('EXPIRY CLAIMS WILL BE ACCEPTED (7) MONTHS BEFORE EXPIRY'),
         Text('FORM 2A (see rule 19 & 30)'),
-        Text('Warranty under section 23(1)(i) of the Drug Act 1976 \nI being a person resident in pakistan carrying on business at company address under the \nname ${user.shopename} and being an authorised agent. do hereby give this warranty that the drugs sold by me \ndo not contravence in anyway in provisions of section 23 of the drug act 1976.'),
-        Text('Note: This Warranty does not apply to unani, Homeopathic, Bio Chemic System of medicineand general items',
-        style: TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+            'Warranty under section 23(1)(i) of the Drug Act 1976 \nI being a person resident in pakistan carrying on business at company address under the \nname ${user.shopename} and being an authorised agent. do hereby give this warranty that the drugs sold by me \ndo not contravence in anyway in provisions of section 23 of the drug act 1976.'),
+        Text(
+            'Note: This Warranty does not apply to unani, Homeopathic, Bio Chemic System of medicineand general items',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         SizedBox(height: 0.3 * PdfPageFormat.cm),
         Text(
-            'This Software is Developed by Pro Creative Solution Copyright © 2021 for Contact +923059797601'),
+            'This Software is Developed by 6xperts Copyright © 2022 for Contact +923059797601'),
       ],
     );

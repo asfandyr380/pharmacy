@@ -92,6 +92,7 @@ class NewSalesViewModel extends ChangeNotifier {
     discountController.dispose();
     grandTotalController.dispose();
     discountController1.dispose();
+    paidController.dispose();
   }
 
   @override
@@ -142,9 +143,11 @@ class NewSalesViewModel extends ChangeNotifier {
   TextEditingController quantityController = TextEditingController();
   TextEditingController packController = TextEditingController();
   TextEditingController discountController = TextEditingController();
+  TextEditingController paidController = TextEditingController();
   List<ProductModel> productlist = [];
   double totalAmt = 0;
   bool isGreater = true;
+
   removeProduct(ProductModel model) {
     productlist.remove(model);
     totalAmt -= model.amount;
@@ -291,17 +294,25 @@ class NewSalesViewModel extends ChangeNotifier {
         double cashDiscount = double.parse(discountController1.text);
         double grandtotal = double.parse(grandTotalController.text);
         double? tax = double.tryParse(taxController.text);
+        final paid = double.tryParse(paidController.text);
         SalesModel model = SalesModel(
           total: totalAmt,
           discount: cashDiscount,
           grandTotal: grandtotal,
           note: sNote,
           date: currentDate,
+          paid: paid ?? 0,
           tax: tax ?? 0,
           time: time.format(context),
           customerId: selectedCustomer != null ? selectedCustomer!.id : 0,
         );
         await _salesService.createNewSale(model).then((value) async {
+          if (selectedCustomer != null) {
+            num previous =
+                (model.total + selectedCustomer!.previous!) - (model.paid);
+            await _customersService.updatePreviousBalance(
+                selectedCustomer!.id!, previous.toDouble());
+          }
           await _salesService
               .createSoldMedicine(productlist, value)
               .then((value) async {
@@ -314,6 +325,7 @@ class NewSalesViewModel extends ChangeNotifier {
         discountController1.text = "0";
         grandTotalController.clear();
         taxController.text = "0";
+        paidController.clear();
       }
     }
   }

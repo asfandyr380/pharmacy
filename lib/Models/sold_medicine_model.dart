@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class SoldMedicineModel {
   int? id = 0;
   int? saleId = 0;

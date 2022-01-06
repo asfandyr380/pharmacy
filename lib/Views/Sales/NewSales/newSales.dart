@@ -44,6 +44,7 @@ class _NewSalesViewState extends State<NewSalesView> {
                   quantityController: model.quantityController,
                   packsController: model.packController,
                   discountController: model.discountController,
+                  paidController: model.paidController,
                   onSave: () => model.savetolist(),
                   onSearch: (_) => model.searchMedicine(_),
                   onSelect: (_) => model.onMedicineSelect(_),
@@ -93,6 +94,7 @@ class NewMedicineContent extends StatelessWidget {
   final TextEditingController? taxController;
   final TextEditingController? discountController1;
   final TextEditingController? grandTotalController;
+  final TextEditingController? paidController;
   final Function? onSaveSale;
   final bool? isLoading;
   final bool? isGreater;
@@ -107,6 +109,7 @@ class NewMedicineContent extends StatelessWidget {
     this.medicineController,
     this.packsController,
     this.quantityController,
+    this.paidController,
     this.onSearch,
     this.onSelect,
     this.onSave,
@@ -147,6 +150,7 @@ class NewMedicineContent extends StatelessWidget {
             quantityController: quantityController,
             packsController: packsController,
             discountController: discountController,
+            paidController: paidController,
             onSave: () => onSave!(),
             onSearch: (_) => onSearch!(_),
             onSelect: (_) => onSelect!(_),
@@ -226,6 +230,7 @@ class ListingRow extends StatelessWidget {
   final TextEditingController? taxController;
   final TextEditingController? discountController1;
   final TextEditingController? grandTotalController;
+  final TextEditingController? paidController;
   final Function? onSaveSale;
   final bool? isLoading;
   final bool? isGreater;
@@ -238,6 +243,7 @@ class ListingRow extends StatelessWidget {
     this.medicineController,
     this.packsController,
     this.quantityController,
+    this.paidController,
     this.onSearch,
     this.onSelect,
     this.onSave,
@@ -296,6 +302,7 @@ class ListingRow extends StatelessWidget {
               taxController: taxController,
               discountController: discountController1,
               grandTotalController: grandTotalController,
+              paidController: paidController,
               onSaveSale: () => onSaveSale!(),
               isLoading: isLoading,
             )
@@ -310,12 +317,14 @@ class ListingRowFields2 extends StatelessWidget {
   final TextEditingController? taxController;
   final TextEditingController? discountController;
   final TextEditingController? grandTotalController;
+  final TextEditingController? paidController;
   final Function? onSaveSale;
   final bool? isLoading;
   const ListingRowFields2({
     this.taxController,
     this.discountController,
     this.grandTotalController,
+    this.paidController,
     this.onSaveSale,
     this.isLoading,
   });
@@ -348,6 +357,14 @@ class ListingRowFields2 extends StatelessWidget {
         ),
         Column(
           children: [
+            TextFieldWithLable(
+              hint: "Enter Paid Ammount",
+              lable: "Paid",
+              controller: paidController,
+            ).box.width(context.percentWidth * 15).make(),
+            SizedBox(
+              height: context.percentHeight * 5,
+            ),
             TextFieldWithLable(
               hint: "Enter Discount",
               lable: "Cash Discount",
