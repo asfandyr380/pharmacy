@@ -68,24 +68,35 @@ Widget _buildProduct(PdfInvoice invoice) {
 }
 
 Widget _buildSummery(PdfInvoice invoice) {
-  num previous = (invoice.sale.total + invoice.customer!.previous!) - (invoice.sale.paid);
+  num previous =
+      (invoice.sale.total + invoice.customer!.previous!) - (invoice.sale.paid);
   return Container(
     alignment: Alignment.centerRight,
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        invoice.customer != null ?
         Expanded(
-          flex: 4,
-          child: Column(
-            children: [
-              _buildText('Current Balance', "${invoice.sale.total}", true),
-              _buildText('Previous', "${invoice.customer!.previous}", true),
-              _buildText('Paid', "${invoice.sale.paid}", true),
-              _buildText('Balance', "${previous.toStringAsFixed(2)}", true),
-            ],
-          ),
-        ): Spacer(flex: 4),
-        Spacer(flex: 2),
+          flex: 2,
+          child: _buildText('Total Items', "${invoice.soldMedicines.length}", false),
+        ),
+        SizedBox(width: 10),
+        invoice.customer != null
+            ? Expanded(
+                flex: 3,
+                child: Column(
+                  children: [
+                    _buildText(
+                        'Current Balance', "${invoice.sale.total}", true),
+                    _buildText(
+                        'Previous', "${invoice.customer!.previous}", true),
+                    _buildText('Paid', "${invoice.sale.paid}", true),
+                    _buildText(
+                        'Balance', "${previous.toStringAsFixed(2)}", true),
+                  ],
+                ),
+              )
+            : Spacer(flex: 4),
+        SizedBox(width: 10),
         Expanded(
           flex: 4,
           child: Column(
@@ -141,8 +152,10 @@ Widget buildHeader(PdfInvoice invoice, UserModel user) {
 Widget _buildCustomerInfo(UserModel customer) =>
     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Cutomer', style: TextStyle(fontWeight: FontWeight.bold)),
-      Text('${customer.name}'),
-      Text('${customer.address1}'),
+      SizedBox(height: 0.2 * PdfPageFormat.cm),
+      Text('${customer.name}', style: TextStyle(fontSize: 15)),
+      SizedBox(height: 0.2 * PdfPageFormat.cm),
+      Text('${customer.address1}', style: TextStyle(fontSize: 15)),
     ]);
 
 Widget _buildInvoiceInfo(SalesModel sale, UserModel user) {

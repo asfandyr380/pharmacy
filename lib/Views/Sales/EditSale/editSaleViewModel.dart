@@ -211,7 +211,7 @@ class EditSaleViewModel extends ChangeNotifier {
         final double unt = _selectedMedicine!.buyingPrice.toDouble();
         final double salePrice = _selectedMedicine!.sellingPrice.toDouble();
         final int packs = int.parse(packController.text);
-        final double amt = (packs * qty * salePrice);
+        final double amt = (qty * salePrice);
         final double finalAmt = amt - (amt * disc / 100);
         final int finalQty = qty * packs;
         if (finalQty > _selectedMedicine!.totalQuantity) {
