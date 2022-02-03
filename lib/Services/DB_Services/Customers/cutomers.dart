@@ -105,7 +105,7 @@ class CustomersService {
     _conn.close();
   }
 
-  Future createNewCustomer(String name, String email, int phone,
+  Future createNewCustomer(String name, String? email, int? phone,
       String address1, String address2, String lisence, String date) async {
     MySqlConnection _conn = await _connection.establishConnection();
     UserModel? user = await LocalStorage.getUserInfo();
@@ -114,8 +114,8 @@ class CustomersService {
       'insert into customer (name, email, phone, address1, address2, user_Id, lisence_no, expiration_date) values(?, ?, ?, ?, ?, ?, ?, ?)',
       [
         name,
-        email,
-        phone,
+        email ?? "",
+        phone ?? 0, 
         address1,
         address2,
         user!.id,

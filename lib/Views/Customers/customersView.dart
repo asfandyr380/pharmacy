@@ -12,6 +12,30 @@ class CustomerView extends StatelessWidget {
   final Function? newCustomer;
   final Function? editCustomer;
   CustomerView({this.newCustomer, this.editCustomer});
+
+  _showDeleteDialog(BuildContext context, {required Function onConfirm}) {
+    return showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Delete"),
+        content: Text("Are you sure"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(_),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              onConfirm();
+              Navigator.pop(_);
+            },
+            child: Text("Confirm"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<CustomerViewModel>.reactive(
@@ -29,7 +53,7 @@ class CustomerView extends StatelessWidget {
                 onChange: (_) => model.searchCutomer(_),
                 contentWidget: CustomerTableContent(
                   userlist: model.customerlist,
-                  onDelete: (_) => model.removeCustomer(_),
+                  onDelete: (_) => _showDeleteDialog(context, onConfirm: () => model.removeCustomer(_)),
                   pageNo: model.pageNo,
                   onNext: () => model.nextPage(),
                   onPrevious: () => model.previous(),

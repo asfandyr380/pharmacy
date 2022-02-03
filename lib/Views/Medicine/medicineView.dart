@@ -13,6 +13,32 @@ class MedicineView extends StatelessWidget {
   final Function? edit;
 
   MedicineView({this.newMedicie, this.edit});
+
+  _showDeleteDialog(BuildContext context, {required Function onConfirm}) {
+    return showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Delete"),
+        content: TextFormField(
+          decoration: InputDecoration(hintText: "Confirmation Password"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(_),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              onConfirm();
+              Navigator.pop(_);
+            },
+            child: Text("Confirm"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<MedicineViewModel>.reactive(
@@ -33,7 +59,7 @@ class MedicineView extends StatelessWidget {
                 onChange: (val) => model.searchMedicine(val),
                 contentWidget: MedicinTableContent(
                   medicinelist: model.medicinelist,
-                  onRemove: (m) => model.remove(m),
+                  onRemove: (m) => _showDeleteDialog(context, onConfirm: () => model.remove(m)),
                   pageNo: model.pageNo,
                   onNext: () => model.nextPage(),
                   onPrevious: () => model.previous(),

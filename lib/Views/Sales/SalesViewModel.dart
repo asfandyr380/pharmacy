@@ -64,7 +64,7 @@ class SalesViewModel extends ChangeNotifier {
 
   onChange(String? val, SalesModel m, BuildContext context) async {
     if (val == 'Print Invoice') {
-      printInvoice(m);
+      _showConfirmDialog(context, m);
     } else if (val == 'Print Receipt') {
       printReceipt();
     } else if (val == 'Return') {
@@ -72,6 +72,28 @@ class SalesViewModel extends ChangeNotifier {
     } else if (val == 'Edit') {
       editSale(m, context);
     }
+  }
+
+  _showConfirmDialog(BuildContext context, SalesModel model) {
+    return showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              content: Text("Do you want footer or not ?"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      printInvoice(model, true);
+                      Navigator.pop(_);
+                    },
+                    child: Text("Yes")),
+                TextButton(
+                    onPressed: () {
+                      printInvoice(model, false);
+                      Navigator.pop(_);
+                    },
+                    child: Text("No")),
+              ],
+            ));
   }
 
   returnItem(SalesModel m, BuildContext context) async {
@@ -111,17 +133,18 @@ class SalesViewModel extends ChangeNotifier {
     );
   }
 
-  printInvoice(SalesModel m) async {
+  printInvoice(SalesModel m, bool showFooter) async {
     final invoice;
     List<SoldMedicineModel> result = await _salesService.getSale(m.id!);
     if (m.customerId != 0) {
       var customer = await _customersService.getCustomer(m.customerId!);
-      invoice = PdfInvoice(sale: m, soldMedicines: result, customer: customer[0]);
+      invoice =
+          PdfInvoice(sale: m, soldMedicines: result, customer: customer[0]);
     } else {
       invoice = PdfInvoice(sale: m, soldMedicines: result);
     }
     await Printing.layoutPdf(
-        onLayout: (format) => PdfInvoiceService.generate(invoice));
+        onLayout: (format) => PdfInvoiceService.generate(invoice, showFooter));
   }
 
   init(BuildContext ctx) {

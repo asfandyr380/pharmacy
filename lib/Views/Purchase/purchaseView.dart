@@ -9,6 +9,8 @@ import 'package:velocity_x/velocity_x.dart';
 class PurchaseView extends StatelessWidget {
   final Function? newPurchase;
   PurchaseView({this.newPurchase});
+
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<PurchaseViewModel>.reactive(

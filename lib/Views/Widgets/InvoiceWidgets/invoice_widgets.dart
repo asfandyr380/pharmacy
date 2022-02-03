@@ -17,7 +17,7 @@ List<Widget> buildInvoice(PdfInvoice invoice) => [
 Widget _buildTitle(PdfInvoice invoice) {
   return Center(
     child: Text(
-      'Invoice',
+      'Quatation',
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 24,
@@ -68,8 +68,11 @@ Widget _buildProduct(PdfInvoice invoice) {
 }
 
 Widget _buildSummery(PdfInvoice invoice) {
-  num previous =
-      (invoice.sale.total + invoice.customer!.previous!) - (invoice.sale.paid);
+  num previous = 0;
+  if (invoice.customer != null)
+    num previous = (invoice.sale.total + invoice.customer!.previous!) -
+        (invoice.sale.paid);
+
   return Container(
     alignment: Alignment.centerRight,
     child: Row(
@@ -77,7 +80,8 @@ Widget _buildSummery(PdfInvoice invoice) {
       children: [
         Expanded(
           flex: 2,
-          child: _buildText('Total Items', "${invoice.soldMedicines.length}", false),
+          child: _buildText(
+              'Total Items', "${invoice.soldMedicines.length}", false),
         ),
         SizedBox(width: 10),
         invoice.customer != null

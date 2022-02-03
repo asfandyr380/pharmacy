@@ -35,7 +35,7 @@ class MedicineService {
           'select medicine_Id, name, category, generic, company from medicine where medicine_Id = $id');
     } else {
       results = await _conn.query(
-          'select medicine_Id, name, category, generic, company from medicine where name like "$name%"');
+          'select medicine_Id, name, category, generic, company from medicine where name like "$name%" or generic like "$name"');
     }
     _conn.close();
     List<MedicineModel> medicinelist = [];

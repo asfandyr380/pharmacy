@@ -59,7 +59,7 @@ class PurchaseViewModel extends ChangeNotifier {
     if (val == 'Edit') {
       editPurchase(m, context);
     } else if (val == 'Delete') {
-      deletePurchase(m, context);
+      _showDeleteDialog(context, onConfirm: ()=> deletePurchase(m, context));
     }
   }
 
@@ -130,3 +130,30 @@ class PurchaseViewModel extends ChangeNotifier {
     ];
   }
 }
+
+
+
+  _showDeleteDialog(BuildContext context, {required Function onConfirm}) {
+    return showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Delete"),
+        content: TextFormField(
+          decoration: InputDecoration(hintText: "Confirmation Password"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(_),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              onConfirm();
+              Navigator.pop(_);
+            },
+            child: Text("Confirm"),
+          ),
+        ],
+      ),
+    );
+  }

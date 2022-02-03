@@ -8,14 +8,14 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 class PdfInvoiceService {
-  static Future<Uint8List> generate(PdfInvoice invoice) async {
+  static Future<Uint8List> generate(PdfInvoice invoice, bool buildF) async {
     UserModel? user = await LocalStorage.getUserInfo();
     final pdf = Document();
 
     pdf.addPage(MultiPage(
       pageFormat: PdfPageFormat.a4,
         margin: EdgeInsets.zero,
-        footer: (context) => buildFooter(user!),
+        footer: buildF ? (context) => buildFooter(user!): (_) => Container(),
         build: (context) => buildInvoice(invoice),
         header: (context) => buildHeader(invoice, user!)));
     return await pdf.save();

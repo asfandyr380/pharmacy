@@ -42,7 +42,7 @@ class _NewSalesViewState extends State<NewSalesView> {
                   },
                   medicineController: model.medicineController,
                   quantityController: model.quantityController,
-                  packsController: model.packController,
+                  packsController: model.priceController,
                   discountController: model.discountController,
                   paidController: model.paidController,
                   onSave: () => model.savetolist(),
@@ -412,7 +412,6 @@ class ListingContent extends StatelessWidget {
           "Name",
           "Price",
           "Qty",
-          "Packs",
           "Disc",
           "Amt",
           ""
@@ -482,15 +481,6 @@ class ListingTableData extends StatelessWidget {
                 .make(),
             Spacer(),
             "${model.quantity}"
-                .text
-                .color(textColor)
-                .normal
-                .make()
-                .box
-                .width(context.percentWidth * _percentWidth)
-                .make(),
-            Spacer(),
-            "${model.packs}"
                 .text
                 .color(textColor)
                 .normal
@@ -629,8 +619,8 @@ class ListingRowFields extends StatelessWidget {
               onSubmit: (_) {
                 FocusScope.of(context).requestFocus(discFocus);
               },
-              hint: 'Enter Packs',
-              lable: 'Packs',
+              hint: 'Enter Price',
+              lable: 'Price',
               controller: packsController,
               validateForm: (_) => InputValidation.numericValueValidation(_),
             ).box.width(context.percentWidth * 18.5).make(),

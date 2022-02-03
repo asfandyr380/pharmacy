@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:medical_store/Config/Utils/brains.dart';
 import 'package:medical_store/Config/Utils/locator.dart';
+import 'package:medical_store/Models/invoice_model.dart';
 import 'package:medical_store/Models/product_model.dart';
 import 'package:medical_store/Models/sales_model.dart';
+import 'package:medical_store/Models/sold_medicine_model.dart';
 import 'package:medical_store/Models/stock_model.dart';
 import 'package:medical_store/Models/user_setting_model.dart';
 import 'package:medical_store/Models/users_model.dart';
@@ -12,7 +14,9 @@ import 'package:medical_store/Services/DB_Services/Customers/cutomers.dart';
 import 'package:medical_store/Services/DB_Services/Sales/sales.dart';
 import 'package:medical_store/Services/DB_Services/Stock/stock.dart';
 import 'package:medical_store/Services/Local_Storage/local_storage.dart';
+import 'package:medical_store/Services/Printing/pdf_service.dart';
 import 'package:medical_store/Views/LandingPage/landingViewModel.dart';
+import 'package:printing/printing.dart';
 
 class NewSalesViewModel extends ChangeNotifier {
   // Initialize Everything That is Needed
@@ -87,7 +91,7 @@ class NewSalesViewModel extends ChangeNotifier {
     }
     medicineController.dispose();
     quantityController.dispose();
-    packController.dispose();
+    priceController.dispose();
     taxController.dispose();
     discountController.dispose();
     grandTotalController.dispose();
@@ -141,9 +145,9 @@ class NewSalesViewModel extends ChangeNotifier {
   // Product List Saving
   TextEditingController medicineController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
-  TextEditingController packController = TextEditingController();
-  TextEditingController discountController = TextEditingController();
-  TextEditingController paidController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
+  TextEditingController discountController = TextEditingController(text: "0");
+  TextEditingController paidController = TextEditingController(text: '0');
   List<ProductModel> productlist = [];
   double totalAmt = 0;
   bool isGreater = true;
@@ -181,11 +185,10 @@ class NewSalesViewModel extends ChangeNotifier {
         final double disc = double.parse(discountController.text);
         final double unt = _selectedMedicine!.buyingPrice.toDouble();
         final double salePrice = _selectedMedicine!.sellingPrice.toDouble();
-        final int packs = int.parse(packController.text);
+        // final int packs = int.parse(packController.text);
         final double amt = (qty * salePrice);
         final double finalAmt = amt - (amt * disc / 100);
-        final int finalQty = qty * packs;
-        if (finalQty > _selectedMedicine!.totalQuantity) {
+        if (qty > _selectedMedicine!.totalQuantity) {
           isGreater = false;
           notifyListeners();
         } else {
@@ -193,7 +196,7 @@ class NewSalesViewModel extends ChangeNotifier {
           ProductModel model = ProductModel(
             amount: finalAmt,
             discount: disc,
-            packs: packs,
+            packs: 0,
             unit: unt,
             salePrice: salePrice,
             id: _selectedMedicine!.id,
@@ -226,8 +229,8 @@ class NewSalesViewModel extends ChangeNotifier {
           notifyListeners();
           medicineController.clear();
           quantityController.clear();
-          packController.clear();
-          discountController.clear();
+          priceController.clear();
+          discountController.text = '0';
         }
       }
     }
@@ -242,6 +245,7 @@ class NewSalesViewModel extends ChangeNotifier {
     medicineController.text = val.name;
     _selectedMedicine = val;
     buyPrice = _selectedMedicine!.buyingPrice.toString();
+    priceController.text = val.sellingPrice.toString();
     notifyListeners();
   }
 
@@ -318,6 +322,7 @@ class NewSalesViewModel extends ChangeNotifier {
               .then((value) async {
             await _stockService.subtractStock(productlist);
           });
+          _showConfirmDialog(context, model, value);
         });
         setBusy(false);
         productlist = [];
@@ -325,9 +330,48 @@ class NewSalesViewModel extends ChangeNotifier {
         discountController1.text = "0";
         grandTotalController.clear();
         taxController.text = "0";
-        paidController.clear();
+        paidController.text = "0";
       }
     }
+  }
+
+  _showConfirmDialog(BuildContext context, SalesModel model, int saleId) {
+    return showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        content: Text("Do you want footer or not ?"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                printInvoice(model, saleId, true);
+                Navigator.pop(_);
+              },
+              child: Text("Yes")),
+          TextButton(
+              onPressed: () {
+                printInvoice(model, saleId, false);
+                Navigator.pop(_);
+              },
+              child: Text("No")),
+        ],
+      ),
+    );
+  }
+
+  printInvoice(SalesModel m, int saleId, bool showFooter) async {
+    final invoice;
+    List<SoldMedicineModel> result = await _salesService.getSale(saleId);
+
+    if (m.customerId != 0) {
+      var customer = await _customersService.getCustomer(m.customerId!);
+      invoice =
+          PdfInvoice(sale: m, soldMedicines: result, customer: customer[0]);
+    } else {
+      invoice = PdfInvoice(sale: m, soldMedicines: result);
+    }
+
+    await Printing.layoutPdf(
+        onLayout: (format) => PdfInvoiceService.generate(invoice, showFooter));
   }
   // Saving Sale
 
