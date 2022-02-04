@@ -172,10 +172,10 @@ class StockService {
     var results;
     if (id != null) {
       results = await _conn.query(
-          'select stock_Id, name, quantity, batchNo, buyingPrice, salePrice from stock where stock_Id = $id and user_Id = ${user!.userId}');
+          'select stock_Id, name, quantity, batchNo, buyingPrice, salePrice from stock where stock_Id = $id and user_Id = ${user!.userId} and quantity > 0');
     } else {
       results = await _conn.query(
-          'select stock_Id, name, quantity, batchNo, buyingPrice, salePrice from stock where name like "$name%" and user_Id = ${user!.userId}');
+          'select stock_Id, name, quantity, batchNo, buyingPrice, salePrice from stock where name like "$name%" and user_Id = ${user!.userId} and quantity > 0');
     }
     _conn.close();
     List<StockModel> stocklist = [];

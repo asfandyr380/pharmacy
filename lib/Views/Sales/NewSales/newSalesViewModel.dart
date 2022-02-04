@@ -184,7 +184,7 @@ class NewSalesViewModel extends ChangeNotifier {
         final int qty = int.parse(quantityController.text);
         final double disc = double.parse(discountController.text);
         final double unt = _selectedMedicine!.buyingPrice.toDouble();
-        final double salePrice = _selectedMedicine!.sellingPrice.toDouble();
+        final double salePrice = num.tryParse(priceController.text)!.toDouble();
         // final int packs = int.parse(packController.text);
         final double amt = (qty * salePrice);
         final double finalAmt = amt - (amt * disc / 100);
@@ -196,7 +196,7 @@ class NewSalesViewModel extends ChangeNotifier {
           ProductModel model = ProductModel(
             amount: finalAmt,
             discount: disc,
-            packs: 0,
+            packs: 1,
             unit: unt,
             salePrice: salePrice,
             id: _selectedMedicine!.id,
