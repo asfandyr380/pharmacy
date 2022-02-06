@@ -299,6 +299,11 @@ class NewSalesViewModel extends ChangeNotifier {
         double grandtotal = double.parse(grandTotalController.text);
         double? tax = double.tryParse(taxController.text);
         final paid = double.tryParse(paidController.text);
+        num previous = 0;
+        if (selectedCustomer != null) {
+          previous = (grandtotal + selectedCustomer!.previous!) - (paid ?? 0);
+        }
+        print(previous);
         SalesModel model = SalesModel(
           total: totalAmt,
           discount: cashDiscount,
@@ -309,11 +314,10 @@ class NewSalesViewModel extends ChangeNotifier {
           tax: tax ?? 0,
           time: time.format(context),
           customerId: selectedCustomer != null ? selectedCustomer!.id : 0,
+          previous: selectedCustomer!.previous != 0 ? previous : 0,
         );
         await _salesService.createNewSale(model).then((value) async {
           if (selectedCustomer != null) {
-            num previous =
-                (model.total + selectedCustomer!.previous!) - (model.paid);
             await _customersService.updatePreviousBalance(
                 selectedCustomer!.id!, previous.toDouble());
           }
@@ -325,6 +329,7 @@ class NewSalesViewModel extends ChangeNotifier {
           _showConfirmDialog(context, model, value);
         });
         setBusy(false);
+        selectedCustomer = null;
         productlist = [];
         totalAmt = 0;
         discountController1.text = "0";

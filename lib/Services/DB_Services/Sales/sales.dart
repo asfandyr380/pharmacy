@@ -15,7 +15,7 @@ class SalesService {
       MySqlConnection _conn = await _connection.establishConnection();
       UserSetting? user = await LocalStorage.getUserSetting();
       var result = await _conn.query(
-        'insert into sales (customer_Id, total, discount, grandTotal, date, user_Id, note, advance_tax, time, paid) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'insert into sales (customer_Id, total, discount, grandTotal, date, user_Id, note, advance_tax, time, paid, previous) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           model.customerId,
           model.total,
@@ -27,6 +27,7 @@ class SalesService {
           model.tax,
           model.time,
           model.paid,
+          model.previous,
         ],
       );
       _conn.close();
@@ -262,6 +263,7 @@ class SalesService {
         'time': r[9],
         'received': r[10],
         'paid': r[11],
+        'previous': r[12],
       };
       var sale = SalesModel.fromJson(map);
       saleslist.add(sale);

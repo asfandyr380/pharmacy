@@ -40,6 +40,7 @@ class _NewSalesViewState extends State<NewSalesView> {
                   onChange: (val) {
                     model.selectedCustomer = val;
                   },
+                  loadCustomerList: () => model.getCustomers(),
                   medicineController: model.medicineController,
                   quantityController: model.quantityController,
                   packsController: model.priceController,
@@ -102,6 +103,7 @@ class NewMedicineContent extends StatelessWidget {
   final bool isVisible;
   final FocusNode node;
   final Function? onKey;
+  final Function loadCustomerList;
   const NewMedicineContent({
     required this.customerlist,
     this.onChange,
@@ -128,6 +130,7 @@ class NewMedicineContent extends StatelessWidget {
     required this.isVisible,
     required this.node,
     this.onKey,
+    required this.loadCustomerList,
   });
 
   @override
@@ -141,6 +144,7 @@ class NewMedicineContent extends StatelessWidget {
           FieldRow(
             customerlist: customerlist,
             onChange: (_) => onChange!(_),
+            loadData: () => loadCustomerList(),
           ),
           SizedBox(
             height: 50,
@@ -180,7 +184,8 @@ class FieldRow extends StatelessWidget {
   final Function? pickDate;
   final Function? onChange;
   final List customerlist;
-  const FieldRow({this.pickDate, this.onChange, required this.customerlist});
+  final Function loadData;
+  const FieldRow({this.pickDate, this.onChange, required this.customerlist, required this.loadData});
 
   @override
   Widget build(BuildContext context) {
@@ -196,6 +201,7 @@ class FieldRow extends StatelessWidget {
             hint: 'Select Customer',
             onChanged: (_) => onChange!(_),
             validate: (_) {},
+            loadData: () => loadData(),
           ),
           GestureDetector(
             onTap: () => model.selectDate(context),
@@ -407,15 +413,9 @@ class ListingContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TableHeader2(headerLables: [
-          "#",
-          "Name",
-          "Price",
-          "Qty",
-          "Disc",
-          "Amt",
-          ""
-        ], percentWidth: 5),
+        TableHeader2(
+            headerLables: ["#", "Name", "Price", "Qty", "Disc", "Amt", ""],
+            percentWidth: 5),
         for (var product in productlist)
           ListingTableData(
             onDelete: (_) => onDelete!(_),

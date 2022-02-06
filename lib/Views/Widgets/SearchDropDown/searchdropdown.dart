@@ -59,6 +59,7 @@ class SearchDropDownHorizontal extends StatelessWidget {
   final Function? validate;
   final Function? onChanged;
   final dynamic selectedItem;
+  final Function? loadData;
   const SearchDropDownHorizontal({
     this.hint,
     required this.items,
@@ -66,10 +67,13 @@ class SearchDropDownHorizontal extends StatelessWidget {
     this.onChanged,
     this.validate,
     this.selectedItem,
+    this.loadData,
   });
 
   @override
   Widget build(BuildContext context) {
+    // bool runOnce = true;
+    // Function _loadData = loadData ?? () {};
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -82,7 +86,9 @@ class SearchDropDownHorizontal extends StatelessWidget {
           showSearchBox: true,
           items: items,
           hint: hint,
-          itemAsString: (_) => '${_.name}',
+          itemAsString: (_) {
+            return '${_.name}';
+          },
           onChanged: (_) => onChanged!(_),
           dropdownSearchDecoration: InputDecoration(
             fillColor: accentColor,

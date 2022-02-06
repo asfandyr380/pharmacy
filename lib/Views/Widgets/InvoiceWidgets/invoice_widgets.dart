@@ -73,7 +73,7 @@ Widget _buildProduct(PdfInvoice invoice) {
 Widget _buildSummery(PdfInvoice invoice) {
   num previous = 0;
   if (invoice.customer != null)
-     previous = (invoice.sale.grandTotal + invoice.customer!.previous!) -
+     previous = (invoice.sale.grandTotal + invoice.sale.previous!) -
         (invoice.sale.paid);
 
   return Container(
@@ -95,7 +95,7 @@ Widget _buildSummery(PdfInvoice invoice) {
                     _buildText(
                         'Current Balance', "${invoice.sale.grandTotal}", true),
                     _buildText(
-                        'Previous', "${invoice.customer!.previous}", true),
+                        'Previous', "${invoice.sale.previous}", true),
                     _buildText('Paid', "${invoice.sale.paid}", true),
                     _buildText(
                         'Balance', "${previous.toStringAsFixed(2)}", true),
