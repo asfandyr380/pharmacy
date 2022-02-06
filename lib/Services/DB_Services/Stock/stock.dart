@@ -50,9 +50,9 @@ class StockService {
     MySqlConnection _conn = await _connection.establishConnection();
     UserSetting? user = await LocalStorage.getUserSetting();
     await _conn.queryMulti(
-      'update stock set quantity = quantity - ? where batchNo = ? and user_Id = ?',
+      'update stock set quantity = quantity - ? where stock_Id = ? and user_Id = ?',
       [
-        for (var m in model) [m.quantity * m.packs!, m.batchNo, user!.userId]
+        for (var m in model) [m.quantity, m.id, user!.userId]
       ],
     );
     _conn.close();

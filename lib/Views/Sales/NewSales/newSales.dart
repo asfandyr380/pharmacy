@@ -424,7 +424,7 @@ class ListingContent extends StatelessWidget {
         SizedBox(
           height: 15,
         ),
-        "Total: ${totalAmt.toDoubleStringAsFixed()}"
+        "Total: ${totalAmt.toStringAsFixed(2)}"
             .text
             .xl
             .color(textColor)
@@ -498,7 +498,7 @@ class ListingTableData extends StatelessWidget {
                 .width(context.percentWidth * _percentWidth)
                 .make(),
             Spacer(),
-            "${model.amount}"
+            "${model.amount.toStringAsFixed(2)}"
                 .text
                 .color(textColor)
                 .normal

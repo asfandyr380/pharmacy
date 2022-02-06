@@ -55,7 +55,10 @@ Widget _buildProduct(PdfInvoice invoice) {
       border: null,
       headerStyle: TextStyle(fontWeight: FontWeight.bold),
       headerDecoration: BoxDecoration(color: PdfColors.blueGrey100),
-      cellHeight: 30,
+      cellHeight: 20,
+      cellStyle: TextStyle(fontSize: 10),
+      cellPadding: EdgeInsets.zero,
+      cellDecoration: (_, __, ___) => BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: PdfColors.grey300))),
       cellAlignments: {
         0: Alignment.centerLeft,
         1: Alignment.centerRight,
@@ -70,7 +73,7 @@ Widget _buildProduct(PdfInvoice invoice) {
 Widget _buildSummery(PdfInvoice invoice) {
   num previous = 0;
   if (invoice.customer != null)
-    num previous = (invoice.sale.total + invoice.customer!.previous!) -
+     previous = (invoice.sale.grandTotal + invoice.customer!.previous!) -
         (invoice.sale.paid);
 
   return Container(
@@ -90,7 +93,7 @@ Widget _buildSummery(PdfInvoice invoice) {
                 child: Column(
                   children: [
                     _buildText(
-                        'Current Balance', "${invoice.sale.total}", true),
+                        'Current Balance', "${invoice.sale.grandTotal}", true),
                     _buildText(
                         'Previous', "${invoice.customer!.previous}", true),
                     _buildText('Paid', "${invoice.sale.paid}", true),
@@ -157,9 +160,9 @@ Widget _buildCustomerInfo(UserModel customer) =>
     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Cutomer', style: TextStyle(fontWeight: FontWeight.bold)),
       SizedBox(height: 0.2 * PdfPageFormat.cm),
-      Text('${customer.name}', style: TextStyle(fontSize: 15)),
+      Text('${customer.name}', style: TextStyle(fontSize: 12)),
       SizedBox(height: 0.2 * PdfPageFormat.cm),
-      Text('${customer.address1}', style: TextStyle(fontSize: 15)),
+      Text('${customer.address1}', style: TextStyle(fontSize: 12)),
     ]);
 
 Widget _buildInvoiceInfo(SalesModel sale, UserModel user) {
@@ -234,7 +237,7 @@ Widget _buildCompanyInfo(UserModel user) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text('$shop_name', style: style),
+      Text('$shop_name', style: style.copyWith(fontSize: 18)),
       SizedBox(height: 0.2 * PdfPageFormat.cm),
       Text('Email:'),
       SizedBox(height: 0.2 * PdfPageFormat.cm),
