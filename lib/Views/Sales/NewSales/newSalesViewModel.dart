@@ -365,6 +365,7 @@ class NewSalesViewModel extends ChangeNotifier {
 
   printInvoice(SalesModel m, int saleId, bool showFooter) async {
     final invoice;
+    m.id = saleId;
     List<SoldMedicineModel> result = await _salesService.getSale(saleId);
 
     if (m.customerId != 0) {

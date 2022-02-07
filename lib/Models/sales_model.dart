@@ -12,7 +12,7 @@ class SalesModel {
     required this.paid,
     this.previous,
   });
-  final int? id;
+   int? id;
   final int? customerId;
   num total;
   num discount;

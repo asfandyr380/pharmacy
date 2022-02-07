@@ -61,7 +61,7 @@ Widget _buildProduct(PdfInvoice invoice) {
       cellDecoration: (_, __, ___) => BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: PdfColors.grey300))),
       cellAlignments: {
         0: Alignment.centerLeft,
-        1: Alignment.centerRight,
+        1: Alignment.centerLeft,
         2: Alignment.centerRight,
         3: Alignment.centerRight,
         4: Alignment.centerRight,
