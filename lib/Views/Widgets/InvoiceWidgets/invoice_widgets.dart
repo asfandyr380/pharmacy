@@ -93,7 +93,7 @@ Widget _buildSummery(PdfInvoice invoice) {
                 child: Column(
                   children: [
                     _buildText(
-                        'Current Balance', "${invoice.sale.grandTotal}", true),
+                        'Current Balance', "${invoice.sale.grandTotal.toStringAsFixed(2)}", true),
                     _buildText(
                         'Previous', "${invoice.sale.previous}", true),
                     _buildText('Paid', "${invoice.sale.paid}", true),
@@ -108,11 +108,11 @@ Widget _buildSummery(PdfInvoice invoice) {
           flex: 4,
           child: Column(
             children: [
-              _buildText('Net Total', '${invoice.sale.total}', false),
+              _buildText('Net Total', '${invoice.sale.total.toStringAsFixed(2)}', false),
               SizedBox(height: 0.4 * PdfPageFormat.cm),
               _buildText('Advance Tax', '${invoice.sale.tax}%', false),
               Divider(),
-              _buildText('Grand Total', '${invoice.sale.grandTotal}', false),
+              _buildText('Grand Total', '${invoice.sale.grandTotal.toStringAsFixed(2)}', false),
             ],
           ),
         )

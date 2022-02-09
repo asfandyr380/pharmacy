@@ -30,6 +30,7 @@ class DashboardView extends StatelessWidget {
                 totalShelf: model.shelfCount,
                 totalStock: model.stockCount,
                 totalSupplier: model.supplierCount,
+                profit: model.profit,
               ),
               xlarge: CardViewLarge(
                 salesAmount: model.salesAmount,
@@ -40,6 +41,7 @@ class DashboardView extends StatelessWidget {
                 totalShelf: model.shelfCount,
                 totalStock: model.stockCount,
                 totalSupplier: model.supplierCount,
+                profit: model.profit,
               ),
               large: CardViewLarge(
                 salesAmount: model.salesAmount,
@@ -50,6 +52,7 @@ class DashboardView extends StatelessWidget {
                 totalShelf: model.shelfCount,
                 totalStock: model.stockCount,
                 totalSupplier: model.supplierCount,
+                profit: model.profit,
               ),
               small: CardViewSmall(
                 salesAmount: model.salesAmount,
@@ -314,6 +317,7 @@ class CardViewLarge extends StatelessWidget {
   final num purchaseAmunt;
   final int noofSales;
   final num salesAmount;
+  final num profit;
   const CardViewLarge({
     required this.noofPurchase,
     required this.totalMedicine,
@@ -323,11 +327,13 @@ class CardViewLarge extends StatelessWidget {
     required this.noofSales,
     required this.salesAmount,
     required this.purchaseAmunt,
+    required this.profit,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -396,6 +402,16 @@ class CardViewLarge extends StatelessWidget {
             ),
           ],
         ),
+        SizedBox(
+          height: context.percentHeight * 2,
+        ),
+        CardBox(
+              widthPercent: 18,
+              icon: Icons.money,
+              label: 'Total Profit',
+              iconColor: Vx.green500,
+              noCount: profit,
+            ).pOnly(left: 20),
         SizedBox(
           height: context.percentHeight * 8,
         ),

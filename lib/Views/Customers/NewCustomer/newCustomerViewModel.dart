@@ -76,6 +76,7 @@ class NewCustomerViewModel extends ChangeNotifier {
       if (validateInput() == 1) {
         setBusy(true);
         int p = int.parse(phoneController.text);
+        print(p);
         await _customersService
             .updateCustomer(
           nameController.text,

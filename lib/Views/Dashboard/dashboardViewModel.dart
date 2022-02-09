@@ -24,6 +24,7 @@ class DashboardViewModel extends ChangeNotifier {
   num purchaseAmount = 0;
   int salesCount = 0;
   num salesAmount = 0;
+  num profit = 0;
 
   // Dispose Stuff
   // bool _disposed = false;
@@ -54,6 +55,15 @@ class DashboardViewModel extends ChangeNotifier {
         getsaleAmount();
       }
     });
+    Future.delayed(Duration(seconds: 2), () {
+      getProfit();
+    });
+  }
+
+  getProfit() {
+    profit = purchaseAmount - salesAmount;
+    profit.abs();
+    notifyListeners();
   }
 
   getShelfCount() async {
