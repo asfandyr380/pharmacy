@@ -3,7 +3,9 @@ import 'package:medical_store/Config/Utils/locator.dart';
 import 'package:medical_store/Models/invoice_model.dart';
 import 'package:medical_store/Models/sales_model.dart';
 import 'package:medical_store/Models/sold_medicine_model.dart';
+import 'package:medical_store/Models/users_model.dart';
 import 'package:medical_store/Services/DB_Services/Customers/cutomers.dart';
+import 'package:medical_store/Services/DB_Services/Reports/report_services.dart';
 import 'package:medical_store/Services/DB_Services/Sales/sales.dart';
 import 'package:medical_store/Services/DB_Services/Stock/stock.dart';
 import 'package:medical_store/Services/Printing/pdf_service.dart';
@@ -133,13 +135,24 @@ class SalesViewModel extends ChangeNotifier {
     );
   }
 
+  ReportServices _reportServices = locator<ReportServices>();
   printInvoice(SalesModel m, bool showFooter) async {
     final invoice;
     List<SoldMedicineModel> result = await _salesService.getSale(m.id!);
     if (m.customerId != 0) {
-      var customer = await _customersService.getCustomer(m.customerId!);
-      invoice =
-          PdfInvoice(sale: m, soldMedicines: result, customer: customer[0]);
+      List<UserModel> customer =
+          await _customersService.getCustomer(m.customerId!);
+      var report;
+      if (customer[0].last_report_Id != 0) {
+        report =
+            await _reportServices.getReportsById(customer[0].last_report_Id!);
+      }
+      invoice = PdfInvoice(
+        sale: m,
+        soldMedicines: result,
+        customer: customer[0],
+        reportModel: report,
+      );
     } else {
       invoice = PdfInvoice(sale: m, soldMedicines: result);
     }
@@ -180,7 +193,7 @@ class SalesViewModel extends ChangeNotifier {
       DataColumn(
         label: Text('Total'),
         onSort: (columnIndex, ascending) =>
-            sort<num>((d) => d.name, columnIndex, ascending),
+            sort<num>((d) => d.total, columnIndex, ascending),
       ),
       DataColumn(
         label: Text('Cash Discount'),

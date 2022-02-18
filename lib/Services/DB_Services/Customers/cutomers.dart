@@ -12,7 +12,7 @@ class CustomersService {
     MySqlConnection _conn = await _connection.establishConnection();
     UserSetting? user = await LocalStorage.getUserSetting();
     var results = await _conn.query(
-        'select customer_Id, name, email, phone, address1, address2, lisence_no, expiration_date, previous from customer where user_Id = ${user!.userId} limit $limit offset $offset');
+        'select customer_Id, name, email, phone, address1, address2, lisence_no, expiration_date, previous, last_report_Id from customer where user_Id = ${user!.userId} limit $limit offset $offset');
     _conn.close();
     List<UserModel> userlist = [];
     for (var field in results) {
@@ -27,6 +27,7 @@ class CustomersService {
         'lisence_no': field[6],
         'date': field[7],
         'previous': field[8],
+        'report_Id': field[9],
       };
       var model = UserModel.fromJson(maped);
       userlist.add(model);
@@ -54,6 +55,7 @@ class CustomersService {
         'lisence_no': field[7],
         'date': field[8],
         'previous': field[9],
+        'report_Id': field[10],
       };
       var model = UserModel.fromJson(maped);
       userlist.add(model);
@@ -66,7 +68,7 @@ class CustomersService {
     UserSetting? user = await LocalStorage.getUserSetting();
 
     var results = await _conn.query(
-        'select customer_Id, name, email, phone, address1, address2, lisence_no, expiration_date from customer where name like "$name%" and user_Id = ${user!.userId}');
+        'select customer_Id, name, email, phone, address1, address2, lisence_no, expiration_date, last_report_Id from customer where name like "$name%" and user_Id = ${user!.userId}');
     _conn.close();
     List<UserModel> customerlist = [];
     for (var field in results) {
@@ -79,6 +81,7 @@ class CustomersService {
         'address2': field[5],
         'lisence_no': field[6],
         'date': field[7],
+        'report_Id': field[8],
       };
       var model = UserModel.fromJson(maped);
       customerlist.add(model);
@@ -86,11 +89,11 @@ class CustomersService {
     return customerlist;
   }
 
-  Future updatePreviousBalance(int id, double previous) async {
+  Future updatePreviousBalance(int id, int reportId, double previous) async {
     MySqlConnection _conn = await _connection.establishConnection();
     await _conn.query(
-      'update customer set previous = ? where customer_Id = ?',
-      [previous, id],
+      'update customer set previous = ?, last_report_Id = ? where customer_Id = ?',
+      [previous, reportId, id],
     );
     _conn.close();
   }

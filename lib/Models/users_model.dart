@@ -12,6 +12,7 @@ class UserModel {
   String? expirationDate = '';
   num? previous = 0;
   int? employeeUserId = 0;
+  int? last_report_Id = 0;
   UserModel({
     this.email,
     this.id,
@@ -36,7 +37,8 @@ class UserModel {
         licenceNo = map['lisence_no'].toString(),
         previous = map['previous'],
         employeeUserId = map['employee_user_Id'],
-        expirationDate = map['date'];
+        expirationDate = map['date'],
+        last_report_Id = map['report_Id'];
 
   Map<String, dynamic> toJson() => {
         "id": id,

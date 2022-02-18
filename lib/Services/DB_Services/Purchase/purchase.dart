@@ -117,12 +117,36 @@ class PurchaseService {
     }
   }
 
+  Future countTotalPurchasebyFilter(String by) async {
+    UserSetting? user = await LocalStorage.getUserSetting();
+
+    MySqlConnection _conn = await _connection.establishConnection();
+    var result = await _conn.query(
+        "select count(purchase_Id) from purchase where user_Id = ${user!.userId} and STR_TO_DATE(date, '%m/%d/%Y') > CURDATE() - INTERVAL $by ORDER BY `purchase`.`date` DESC");
+    _conn.close();
+    for (var count in result) {
+      return count[0];
+    }
+  }
+
   Future countTotalPurchaseAmount() async {
     UserSetting? user = await LocalStorage.getUserSetting();
 
     MySqlConnection _conn = await _connection.establishConnection();
     var result = await _conn.query(
         'select sum(grandTotal) from purchase where user_Id = ${user!.userId}');
+    _conn.close();
+    for (var count in result) {
+      return count[0];
+    }
+  }
+
+  Future countTotalPurchaseAmountByFilter(String by) async {
+    UserSetting? user = await LocalStorage.getUserSetting();
+
+    MySqlConnection _conn = await _connection.establishConnection();
+    var result = await _conn.query(
+        "select sum(grandTotal) from purchase where user_Id = ${user!.userId} and STR_TO_DATE(date, '%m/%d/%Y') > CURDATE() - INTERVAL $by ORDER BY `purchase`.`date` DESC");
     _conn.close();
     for (var count in result) {
       return count[0];

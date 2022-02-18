@@ -7,6 +7,7 @@ import 'package:medical_store/Services/DB_Services/Customers/cutomers.dart';
 import 'package:medical_store/Services/DB_Services/Employee/employee.dart';
 import 'package:medical_store/Services/DB_Services/Medicine/medicine.dart';
 import 'package:medical_store/Services/DB_Services/Purchase/purchase.dart';
+import 'package:medical_store/Services/DB_Services/Reports/report_services.dart';
 import 'package:medical_store/Services/DB_Services/Sales/sales.dart';
 import 'package:medical_store/Services/DB_Services/Shelf/shelf.dart';
 import 'package:medical_store/Services/DB_Services/Stock/stock.dart';
@@ -29,4 +30,5 @@ setupLocator() {
   locator.registerLazySingleton(() => PurchaseService());
   locator.registerLazySingleton(() => LoginService());
   locator.registerLazySingleton(() => UserService());
+  locator.registerLazySingleton(() => ReportServices());
 }

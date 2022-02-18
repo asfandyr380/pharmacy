@@ -58,7 +58,9 @@ Widget _buildProduct(PdfInvoice invoice) {
       cellHeight: 20,
       cellStyle: TextStyle(fontSize: 10),
       cellPadding: EdgeInsets.zero,
-      cellDecoration: (_, __, ___) => BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: PdfColors.grey300))),
+      cellDecoration: (_, __, ___) => BoxDecoration(
+          border: Border.symmetric(
+              horizontal: BorderSide(color: PdfColors.grey300))),
       cellAlignments: {
         0: Alignment.centerLeft,
         1: Alignment.centerLeft,
@@ -73,7 +75,7 @@ Widget _buildProduct(PdfInvoice invoice) {
 Widget _buildSummery(PdfInvoice invoice) {
   num previous = 0;
   if (invoice.customer != null)
-     previous = (invoice.sale.grandTotal + invoice.sale.previous!) -
+    previous = (invoice.sale.grandTotal + invoice.sale.previous!) -
         (invoice.sale.paid);
 
   return Container(
@@ -92,10 +94,9 @@ Widget _buildSummery(PdfInvoice invoice) {
                 flex: 3,
                 child: Column(
                   children: [
-                    _buildText(
-                        'Current Balance', "${invoice.sale.grandTotal.toStringAsFixed(2)}", true),
-                    _buildText(
-                        'Previous', "${invoice.sale.previous}", true),
+                    _buildText('Current Balance',
+                        "${invoice.sale.grandTotal.toStringAsFixed(2)}", true),
+                    _buildText('Previous', "${invoice.sale.previous}", true),
                     _buildText('Paid', "${invoice.sale.paid}", true),
                     _buildText(
                         'Balance', "${previous.toStringAsFixed(2)}", true),
@@ -108,11 +109,13 @@ Widget _buildSummery(PdfInvoice invoice) {
           flex: 4,
           child: Column(
             children: [
-              _buildText('Net Total', '${invoice.sale.total.toStringAsFixed(2)}', false),
+              _buildText('Net Total',
+                  '${invoice.sale.total.toStringAsFixed(2)}', false),
               SizedBox(height: 0.4 * PdfPageFormat.cm),
               _buildText('Advance Tax', '${invoice.sale.tax}%', false),
               Divider(),
-              _buildText('Grand Total', '${invoice.sale.grandTotal.toStringAsFixed(2)}', false),
+              _buildText('Grand Total',
+                  '${invoice.sale.grandTotal.toStringAsFixed(2)}', false),
             ],
           ),
         )

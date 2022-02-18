@@ -23,7 +23,7 @@ class CardInfo extends StatelessWidget {
             SizedBox(
               width: context.percentWidth * 1,
             ),
-            "$noCount".text.xl2.color(iconColor ?? primaryColor).make(),
+            "${noCount.toStringAsFixed(2)}".text.xl2.color(iconColor ?? primaryColor).make(),
           ],
         ),
         SizedBox(

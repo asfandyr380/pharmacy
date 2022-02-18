@@ -5,12 +5,14 @@ import 'package:medical_store/Config/Utils/brains.dart';
 import 'package:medical_store/Config/Utils/locator.dart';
 import 'package:medical_store/Models/invoice_model.dart';
 import 'package:medical_store/Models/product_model.dart';
+import 'package:medical_store/Models/report_model.dart';
 import 'package:medical_store/Models/sales_model.dart';
 import 'package:medical_store/Models/sold_medicine_model.dart';
 import 'package:medical_store/Models/stock_model.dart';
 import 'package:medical_store/Models/user_setting_model.dart';
 import 'package:medical_store/Models/users_model.dart';
 import 'package:medical_store/Services/DB_Services/Customers/cutomers.dart';
+import 'package:medical_store/Services/DB_Services/Reports/report_services.dart';
 import 'package:medical_store/Services/DB_Services/Sales/sales.dart';
 import 'package:medical_store/Services/DB_Services/Stock/stock.dart';
 import 'package:medical_store/Services/Local_Storage/local_storage.dart';
@@ -133,12 +135,24 @@ class NewSalesViewModel extends ChangeNotifier {
   // Fetch Customer
   List<UserModel> customerlist = [];
   CustomersService _customersService = locator<CustomersService>();
+  ReportServices _reportService = locator<ReportServices>();
   UserModel? selectedCustomer;
-
+  ReportModel? selectedCustomerReport;
   getCustomers() async {
     List<UserModel> result = await _customersService.getCustomers(50, 0);
     customerlist = result;
     notifyListeners();
+  }
+
+  selectCustomer(UserModel cus) async {
+    selectedCustomer = cus;
+    notifyListeners();
+    if (cus.last_report_Id != 0) {
+      ReportModel res =
+          await _reportService.getReportsById(cus.last_report_Id!);
+      selectedCustomerReport = res;
+      
+    }
   }
   // Fetch Customer
 
@@ -150,6 +164,7 @@ class NewSalesViewModel extends ChangeNotifier {
   TextEditingController paidController = TextEditingController(text: '0');
   List<ProductModel> productlist = [];
   double totalAmt = 0;
+  double previousPlusTotal = 0;
   bool isGreater = true;
 
   removeProduct(ProductModel model) {
@@ -206,6 +221,9 @@ class NewSalesViewModel extends ChangeNotifier {
           );
           productlist.add(model);
           totalAmt = Brains.calculateProductTotalAmt(productlist);
+          if (selectedCustomer != null) {
+            previousPlusTotal = selectedCustomer!.previous! + totalAmt;
+          }
           grandTotalController.text = totalAmt.toStringAsFixed(2);
           notifyListeners();
           if (taxController.text.isNotEmpty) {
@@ -290,6 +308,13 @@ class NewSalesViewModel extends ChangeNotifier {
   TextEditingController discountController1 = TextEditingController(text: "0");
   TextEditingController grandTotalController = TextEditingController(text: "0");
 
+  int radioVal = 1;
+
+  onRadioChange(int val) {
+    radioVal = val;
+    notifyListeners();
+  }
+
   saveSale(BuildContext context) async {
     if (connection) {
       if (productlist.isNotEmpty) {
@@ -300,10 +325,9 @@ class NewSalesViewModel extends ChangeNotifier {
         double? tax = double.tryParse(taxController.text);
         final paid = double.tryParse(paidController.text);
         num previous = 0;
-        if (selectedCustomer != null) {
+        if (selectedCustomer != null && selectedCustomerReport != null) {
           previous = (grandtotal + selectedCustomer!.previous!) - (paid ?? 0);
         }
-        print(previous);
         SalesModel model = SalesModel(
           total: totalAmt,
           discount: cashDiscount,
@@ -317,10 +341,46 @@ class NewSalesViewModel extends ChangeNotifier {
           previous: selectedCustomer!.previous != 0 ? previous : 0,
         );
         await _salesService.createNewSale(model).then((value) async {
+          var balance = 0.0;
+          var debit = 0.0;
+          if (selectedCustomerReport != null) {
+            switch (radioVal) {
+              case 1:
+                balance =
+                    (grandtotal + selectedCustomerReport!.balance) - paid!;
+                debit = previousPlusTotal - paid;
+                break;
+              case 2:
+                balance = selectedCustomerReport!.balance == 0
+                    ? 0
+                    : (grandtotal - selectedCustomerReport!.balance);
+                break;
+            }
+          } else {
+            switch (radioVal) {
+              case 1:
+                balance = grandtotal - paid!;
+                debit = previousPlusTotal - paid;
+                break;
+              case 2:
+                balance = 0;
+                break;
+            }
+          }
+
+          var report = ReportModel(
+              customer_Id: selectedCustomer != null ? selectedCustomer!.id! : 0,
+              debit: radioVal == 1 ? debit : 0,
+              credit: radioVal == 2 ? grandtotal : 0,
+              balance: balance.abs(),
+              date: "");
+          var report_res =
+              await _reportService.createReports(report, currentDate);
           if (selectedCustomer != null) {
             await _customersService.updatePreviousBalance(
-                selectedCustomer!.id!, previous.toDouble());
+                selectedCustomer!.id!, report_res, previous.toDouble());
           }
+
           await _salesService
               .createSoldMedicine(productlist, value)
               .then((value) async {
@@ -332,10 +392,14 @@ class NewSalesViewModel extends ChangeNotifier {
         selectedCustomer = null;
         productlist = [];
         totalAmt = 0;
+        previousPlusTotal = 0;
         discountController1.text = "0";
         grandTotalController.clear();
         taxController.text = "0";
         paidController.text = "0";
+        customerlist = [];
+        getCustomers();
+        notifyListeners();
       }
     }
   }

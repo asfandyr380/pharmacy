@@ -3,6 +3,7 @@ import 'package:medical_store/Config/Utils/inputValidation.dart';
 import 'package:medical_store/Config/const.dart';
 import 'package:medical_store/Models/product_model.dart';
 import 'package:medical_store/Models/stock_model.dart';
+import 'package:medical_store/Models/users_model.dart';
 import 'package:medical_store/Views/Sales/NewSales/newSalesViewModel.dart';
 import 'package:medical_store/Views/Widgets/Box/box.dart';
 import 'package:medical_store/Views/Widgets/CustomButton/custombutton.dart';
@@ -37,9 +38,8 @@ class _NewSalesViewState extends State<NewSalesView> {
               boxContent: ListingBoxContent(
                 contentWidget: NewMedicineContent(
                   customerlist: model.customerlist,
-                  onChange: (val) {
-                    model.selectedCustomer = val;
-                  },
+                  selectedCustomer: model.selectedCustomer,
+                  onChange: (val) => model.selectCustomer(val),
                   loadCustomerList: () => model.getCustomers(),
                   medicineController: model.medicineController,
                   quantityController: model.quantityController,
@@ -64,6 +64,9 @@ class _NewSalesViewState extends State<NewSalesView> {
                   buyPrice: model.buyPrice,
                   node: model.focusNode,
                   onKey: (event) => model.onKeyPress(event),
+                  selectedRadioValue: model.radioVal,
+                  onRadioChange: (val) => model.onRadioChange(val),
+                  prevoiusPlusTotal: model.previousPlusTotal,
                 ),
                 headerTxt: 'New Sale',
                 isSearchable: true,
@@ -104,6 +107,10 @@ class NewMedicineContent extends StatelessWidget {
   final FocusNode node;
   final Function? onKey;
   final Function loadCustomerList;
+  final UserModel? selectedCustomer;
+  final Function onRadioChange;
+  final int selectedRadioValue;
+  final double prevoiusPlusTotal;
   const NewMedicineContent({
     required this.customerlist,
     this.onChange,
@@ -131,6 +138,10 @@ class NewMedicineContent extends StatelessWidget {
     required this.node,
     this.onKey,
     required this.loadCustomerList,
+    this.selectedCustomer,
+    required this.onRadioChange,
+    required this.selectedRadioValue,
+    required this.prevoiusPlusTotal,
   });
 
   @override
@@ -142,6 +153,7 @@ class NewMedicineContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FieldRow(
+            selectedCustomer: selectedCustomer,
             customerlist: customerlist,
             onChange: (_) => onChange!(_),
             loadData: () => loadCustomerList(),
@@ -173,6 +185,9 @@ class NewMedicineContent extends StatelessWidget {
             buyPrice: buyPrice,
             node: node,
             onKey: (_) => onKey!(_),
+            selectedRadioValue: selectedRadioValue,
+            onRadioChange: (val) => onRadioChange(val),
+            prevoiusPlusTotal: prevoiusPlusTotal,
           ),
         ],
       ),
@@ -185,7 +200,13 @@ class FieldRow extends StatelessWidget {
   final Function? onChange;
   final List customerlist;
   final Function loadData;
-  const FieldRow({this.pickDate, this.onChange, required this.customerlist, required this.loadData});
+  final UserModel? selectedCustomer;
+  const FieldRow(
+      {this.pickDate,
+      this.onChange,
+      this.selectedCustomer,
+      required this.customerlist,
+      required this.loadData});
 
   @override
   Widget build(BuildContext context) {
@@ -195,13 +216,24 @@ class FieldRow extends StatelessWidget {
       builder: (ctx, model, child) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          SearchDropDownHorizontal(
-            items: customerlist,
-            label: 'Customer',
-            hint: 'Select Customer',
-            onChanged: (_) => onChange!(_),
-            validate: (_) {},
-            loadData: () => loadData(),
+          Wrap(
+            direction: Axis.vertical,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 10,
+            children: [
+              SearchDropDownHorizontal(
+                items: customerlist,
+                selectedItem: selectedCustomer,
+                label: 'Customer',
+                hint: 'Select Customer',
+                onChanged: (_) => onChange!(_),
+                validate: (_) {},
+                loadData: () => loadData(),
+              ),
+              selectedCustomer != null
+                  ? Text("Previous: ${selectedCustomer!.previous}")
+                  : SizedBox(),
+            ],
           ),
           GestureDetector(
             onTap: () => model.selectDate(context),
@@ -244,6 +276,9 @@ class ListingRow extends StatelessWidget {
   final bool isVisible;
   final FocusNode node;
   final Function? onKey;
+  final Function onRadioChange;
+  final int selectedRadioValue;
+  final double prevoiusPlusTotal;
   const ListingRow({
     this.discountController,
     this.medicineController,
@@ -268,6 +303,9 @@ class ListingRow extends StatelessWidget {
     required this.isVisible,
     required this.node,
     this.onKey,
+    required this.onRadioChange,
+    required this.selectedRadioValue,
+    required this.prevoiusPlusTotal,
   });
 
   @override
@@ -299,6 +337,7 @@ class ListingRow extends StatelessWidget {
                 onDelete: (_) => onDelete!(_),
                 productlist: productlist,
                 totalAmt: totalAmt,
+                prevoiusPlusTotal: prevoiusPlusTotal,
               ),
             ),
             SizedBox(
@@ -311,6 +350,8 @@ class ListingRow extends StatelessWidget {
               paidController: paidController,
               onSaveSale: () => onSaveSale!(),
               isLoading: isLoading,
+              selectedRadioValue: selectedRadioValue,
+              onRadioChange: (val) => onRadioChange(val),
             )
           ],
         ),
@@ -326,6 +367,8 @@ class ListingRowFields2 extends StatelessWidget {
   final TextEditingController? paidController;
   final Function? onSaveSale;
   final bool? isLoading;
+  final Function onRadioChange;
+  final int selectedRadioValue;
   const ListingRowFields2({
     this.taxController,
     this.discountController,
@@ -333,6 +376,8 @@ class ListingRowFields2 extends StatelessWidget {
     this.paidController,
     this.onSaveSale,
     this.isLoading,
+    required this.onRadioChange,
+    required this.selectedRadioValue,
   });
 
   @override
@@ -363,6 +408,30 @@ class ListingRowFields2 extends StatelessWidget {
         ),
         Column(
           children: [
+            Row(
+              children: [
+                Row(
+                  children: [
+                    Radio(
+                      value: 1,
+                      groupValue: selectedRadioValue,
+                      onChanged: (val) => onRadioChange(val),
+                    ),
+                    Text('Debit'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio(
+                      value: 2,
+                      groupValue: selectedRadioValue,
+                      onChanged: (val) => onRadioChange(val),
+                    ),
+                    Text('Credit'),
+                  ],
+                ),
+              ],
+            ),
             TextFieldWithLable(
               hint: "Enter Paid Ammount",
               lable: "Paid",
@@ -403,10 +472,12 @@ class ListingContent extends StatelessWidget {
   final Function? onDelete;
   final List<ProductModel> productlist;
   final double totalAmt;
+  final double prevoiusPlusTotal;
   const ListingContent({
     this.onDelete,
     required this.productlist,
     required this.totalAmt,
+    required this.prevoiusPlusTotal,
   });
 
   @override
@@ -421,10 +492,18 @@ class ListingContent extends StatelessWidget {
             onDelete: (_) => onDelete!(_),
             model: product,
           ),
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 15),
         "Total: ${totalAmt.toStringAsFixed(2)}"
+            .text
+            .xl
+            .color(textColor)
+            .make()
+            .box
+            .alignCenterRight
+            .make()
+            .pOnly(right: 75),
+        SizedBox(height: 10),
+        "Previous + Total: ${prevoiusPlusTotal.toStringAsFixed(2)}"
             .text
             .xl
             .color(textColor)

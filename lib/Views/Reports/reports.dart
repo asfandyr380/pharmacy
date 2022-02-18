@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:medical_store/Config/const.dart';
+import 'package:medical_store/Models/report_model.dart';
 import 'package:medical_store/Models/sales_model.dart';
 import 'package:medical_store/Views/Reports/reportsViewModel.dart';
+import 'package:medical_store/Views/Widgets/CardBox/cardbox.dart';
 import 'package:medical_store/Views/Widgets/CustomTableHeader/customtableheader.dart';
 import 'package:medical_store/Views/Widgets/ListingBox/listingbox.dart';
 import 'package:medical_store/Views/Widgets/ListingBox/paginationButtons.dart';
@@ -18,13 +21,102 @@ class ReportsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: context.percentHeight * 3),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CardBox(
+                  widthPercent: 18,
+                  icon: Icons.shopping_cart,
+                  label: 'No of Purchase',
+                  iconColor: Vx.green500,
+                  noCount: model.purchaseCount,
+                ),
+                CardBox(
+                  widthPercent: 18,
+                  icon: Icons.money,
+                  label: 'Total Purchase Amount',
+                  iconColor: Vx.green500,
+                  noCount: model.purchaseAmount,
+                ),
+                CardBox(
+                  widthPercent: 18,
+                  icon: Icons.shopping_basket,
+                  label: 'No of Sales',
+                  iconColor: Vx.green500,
+                  noCount: model.salesCount,
+                ),
+                CardBox(
+                  widthPercent: 18,
+                  icon: Icons.money,
+                  label: 'Total Sales Amount',
+                  iconColor: Vx.green500,
+                  noCount: model.salesAmt,
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            CardBox(
+              widthPercent: 18,
+              icon: Icons.money,
+              label: 'Total Profit',
+              iconColor: Vx.green500,
+              noCount: model.profit,
+            ).pOnly(left: 20),
+            SizedBox(height: 10),
+            Wrap(
+              spacing: 18,
+              children: [
+                OutlinedButton(
+                  onPressed: () => model.selectfilter("1 Month"),
+                  style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all(
+                        model.selectedFilter == "1 Month"
+                            ? Colors.white
+                            : primaryColor,
+                      ),
+                      backgroundColor: MaterialStateProperty.all(
+                        model.selectedFilter == "1 Month" ? Colors.green : null,
+                      )),
+                  child: Text('Month'),
+                ),
+                OutlinedButton(
+                  onPressed: () => model.selectfilter("7 Day"),
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(
+                      model.selectedFilter == "7 Day"
+                          ? Colors.white
+                          : primaryColor,
+                    ),
+                    backgroundColor: MaterialStateProperty.all(
+                      model.selectedFilter == "7 Day" ? Colors.green : null,
+                    ),
+                  ),
+                  child: Text('Week'),
+                ),
+                OutlinedButton(
+                  onPressed: () => model.selectfilter("1 Day"),
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(
+                      model.selectedFilter == "1 Day"
+                          ? Colors.white
+                          : primaryColor,
+                    ),
+                    backgroundColor: MaterialStateProperty.all(
+                      model.selectedFilter == "1 Day" ? Colors.green : null,
+                    ),
+                  ),
+                  child: Text('Day'),
+                ),
+              ],
+            ).pOnly(left: 20),
+            SizedBox(height: 10),
             ListingBox(
               boxContent: ListingBoxContent(
                 onSubmit: (_) {},
                 isSearchable: true,
                 onChange: (_) {},
                 contentWidget: EmployeTableContent(
-                  userlist: model.saleslist,
+                  userlist: model.reports,
                   // onDelete: (_) => model.removeEmployee(_),
                   onEdit: (_) => model.update(_),
                   pageNo: model.pageNo,
@@ -43,7 +135,7 @@ class ReportsView extends StatelessWidget {
 }
 
 class EmployeTableContent extends StatelessWidget {
-  final List<SalesModel> userlist;
+  final List<ReportModel> userlist;
   final Function(int)? onDelete;
   final Function? onNext;
   final int pageNo;
@@ -65,11 +157,11 @@ class EmployeTableContent extends StatelessWidget {
     return Column(
       children: [
         TableHeader2(headerLables: [
-          'Sale Code',
+          'Customer',
           "Date",
-          'Grand Total',
-          'Received',
-          'Action'
+          'Debit',
+          'Credit',
+          'balance',
         ]),
         for (var user in userlist)
           EmployeTableItems(
@@ -92,7 +184,7 @@ class EmployeTableContent extends StatelessWidget {
 }
 
 class EmployeTableItems extends StatelessWidget {
-  final SalesModel model;
+  final ReportModel model;
   final Function(int)? onDelete;
   final Function? onEdit;
   const EmployeTableItems({required this.model, this.onDelete, this.onEdit});
@@ -103,23 +195,14 @@ class EmployeTableItems extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TableItem(itemName: "${model.id}"),
+            TableItem(itemName: "${model.customer_Id}"),
             TableItem(itemName: "${model.date}"),
-            TableItem(itemName: '${model.grandTotal}'),
-            EditableField(
-              initialValue: '${model.received}',
-              onChange: (val) {
-                if (val.isNotEmpty) {
-                  num? value = double.tryParse(val);
-                  if (value != null) {
-                    model.received = value;
-                  }
-                }
-              },
-            ),
-            ActionButtons(
-              onEdit: () => onEdit!(model),
-            )
+            TableItem(itemName: '${model.debit}'),
+            TableItem(itemName: '${model.credit}'),
+            TableItem(itemName: '${model.balance}'),
+            // ActionButtons(
+            //   onEdit: () => onEdit!(model),
+            // )
           ],
         ),
         Divider()
