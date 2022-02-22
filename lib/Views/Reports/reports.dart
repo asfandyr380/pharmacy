@@ -10,6 +10,8 @@ import 'package:medical_store/Views/Widgets/ListingBox/paginationButtons.dart';
 import 'package:stacked/stacked.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../Widgets/SearchDropDown/searchdropdown.dart';
+
 class ReportsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -109,6 +111,22 @@ class ReportsView extends StatelessWidget {
                 ),
               ],
             ).pOnly(left: 20),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SearchDropDownHorizontal(
+                  items: model.customerlist,
+                  selectedItem: model.selectedCustomer,
+                  label: 'Customer',
+                  hint: 'Select Customer',
+                  onChanged: (_) => model.selectCustomer(_),
+                  validate: (_) {},
+                  loadData: () => model.getCustomers(),
+                ),
+                Icon(Icons.close).onTap(() => model.removeCustomer()),
+              ],
+            ).pOnly(right: 20),
             SizedBox(height: 10),
             ListingBox(
               boxContent: ListingBoxContent(

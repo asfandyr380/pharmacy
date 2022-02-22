@@ -7,6 +7,9 @@ import 'package:medical_store/Services/DB_Services/Reports/report_services.dart'
 import 'package:medical_store/Services/DB_Services/Sales/sales.dart';
 import 'package:medical_store/Views/LandingPage/landingViewModel.dart';
 
+import '../../Models/users_model.dart';
+import '../../Services/DB_Services/Customers/cutomers.dart';
+
 class ReportsViewModel extends ChangeNotifier {
   List<ReportModel> reports = [];
   SalesService _salesService = locator<SalesService>();
@@ -26,6 +29,7 @@ class ReportsViewModel extends ChangeNotifier {
 
   init() {
     if (connection) {
+      getCustomers();
       getsaleAmount();
       getpurchaseAmount();
       getPurchaseCount();
@@ -35,6 +39,28 @@ class ReportsViewModel extends ChangeNotifier {
       });
       getReports();
     }
+  }
+
+  List<UserModel> customerlist = [];
+  CustomersService _customersService = locator<CustomersService>();
+  UserModel? selectedCustomer;
+  getCustomers() async {
+    List<UserModel> result = await _customersService.getCustomers(50, 0);
+    customerlist = result;
+    notifyListeners();
+  }
+
+  selectCustomer(UserModel cus) async {
+    selectedCustomer = cus;
+    notifyListeners();
+    getReportsById(cus.id!);
+  }
+
+  removeCustomer()
+  {
+    selectedCustomer = null;
+    notifyListeners();
+    getReports();
   }
 
   getProfit() {
@@ -97,6 +123,11 @@ class ReportsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  getReportsById(int id) async {
+    List<ReportModel> res = await _reportService.getReportsByCustomer(id);
+    reports = res;
+    notifyListeners();
+  }
 
   nextPage() {
     if (reports.length == 10) {
